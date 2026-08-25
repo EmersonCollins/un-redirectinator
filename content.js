@@ -1,43 +1,111 @@
-const REDIRECT_KEYS = [
-  "url",
-  "u",
-  "redirect",
-  "redirect_uri",
-  "target",
-  "to",
-  "dest",
-  "destination"
-];
+const DEFAULTS = {
+  enabled: true,
+  protectedSites: []
+};
 
-const isNavigableUrl = (candidate) => {
+const parseUrl = (candidate, baseUrl = window.location.href) => {
   try {
-    const parsed = new URL(candidate);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    return new URL(candidate, baseUrl);
   } catch {
-    return false;
+    return null;
   }
 };
 
-const getRedirectTarget = (currentUrl) => {
-  for (const key of REDIRECT_KEYS) {
-    const value = currentUrl.searchParams.get(key);
-    if (value && isNavigableUrl(value)) {
-      return value;
+const isHttp = (url) => url && (url.protocol === "http:" || url.protocol === "https:");
+
+const isCrossSite = (candidateUrl) => {
+  const parsed = parseUrl(candidateUrl);
+  return isHttp(parsed) && parsed.hostname !== window.location.hostname;
+};
+
+const blockEvent = (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+};
+
+const protectAnchorClicks = () => {
+  document.addEventListener(
+    "click",
+    (event) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!anchor) {
+        return;
+      }
+
+      if (isCrossSite(anchor.getAttribute("href"))) {
+        blockEvent(event);
+      }
+    },
+    true
+  );
+};
+
+const protectFormSubmits = () => {
+  document.addEventListener(
+    "submit",
+    (event) => {
+      if (event.defaultPrevented || !(event.target instanceof HTMLFormElement)) {
+        return;
+      }
+
+      if (isCrossSite(event.target.getAttribute("action") || window.location.href)) {
+        blockEvent(event);
+      }
+    },
+    true
+  );
+};
+
+const protectWindowOpen = () => {
+  const originalOpen = window.open;
+  window.open = function patchedOpen(url, target, features) {
+    if (typeof url === "string" && isCrossSite(url)) {
+      return null;
     }
-  }
-
-  return null;
+    return originalOpen.call(window, url, target, features);
+  };
 };
 
-chrome.storage.sync.get({ enabled: true }, ({ enabled }) => {
-  if (!enabled) {
+const protectLocationMethods = () => {
+  const originalAssign = Location.prototype.assign;
+  const originalReplace = Location.prototype.replace;
+
+  Location.prototype.assign = function patchedAssign(url) {
+    if (typeof url === "string" && isCrossSite(url)) {
+      return;
+    }
+    return originalAssign.call(this, url);
+  };
+
+  Location.prototype.replace = function patchedReplace(url) {
+    if (typeof url === "string" && isCrossSite(url)) {
+      return;
+    }
+    return originalReplace.call(this, url);
+  };
+};
+
+const enableProtection = () => {
+  protectAnchorClicks();
+  protectFormSubmits();
+  protectWindowOpen();
+  protectLocationMethods();
+};
+
+chrome.storage.sync.get(DEFAULTS, ({ enabled, protectedSites }) => {
+  if (!enabled || !Array.isArray(protectedSites)) {
     return;
   }
 
-  const currentUrl = new URL(window.location.href);
-  const target = getRedirectTarget(currentUrl);
+  const isProtected = protectedSites
+    .map((host) => String(host).trim().toLowerCase())
+    .includes(window.location.hostname.toLowerCase());
 
-  if (target && target !== window.location.href) {
-    console.debug("[Unredirectinator] Redirect target detected:", target);
+  if (isProtected) {
+    enableProtection();
   }
 });
