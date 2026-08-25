@@ -1,16 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "Unredirectinator",
-  "description": "Starter Chromium extension that bypasses common redirect wrapper URLs.",
-  "version": "0.1.0",
-  "permissions": ["storage"],
+  "name": "Un-Redirectinator!",
+  "description": "Blocks a protected site from redirecting you away or opening other tabs.",
+  "version": "0.2.0",
+  "permissions": ["storage", "tabs", "declarativeNetRequest"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_title": "Unredirectinator",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "media/unredirectinator.png"
   },
   "content_scripts": [
     {
