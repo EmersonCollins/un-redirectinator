@@ -6,7 +6,7 @@ Starter Chromium extension project that bypasses common redirect wrapper URLs.
 
 - `manifest.json`: extension metadata and wiring
 - `background.js`: initializes extension settings
-- `content.js`: detects redirect wrapper URLs and jumps to target URLs
+- `content.js`: detects redirect wrapper URLs (starter behavior logs target URLs)
 - `popup.html` + `popup.js`: simple enable/disable toggle
 
 ## Load in Chromium

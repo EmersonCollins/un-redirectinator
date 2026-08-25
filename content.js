@@ -38,6 +38,6 @@ chrome.storage.sync.get({ enabled: true }, ({ enabled }) => {
   const target = getRedirectTarget(currentUrl);
 
   if (target && target !== window.location.href) {
-    window.location.replace(target);
+    console.debug("[Unredirectinator] Redirect target detected:", target);
   }
 });
