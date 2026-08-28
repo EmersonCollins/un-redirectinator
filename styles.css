@@ -1,8 +1,12 @@
 body {
+  background: #fff;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 12px;
   min-width: 220px;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .toggle-button {

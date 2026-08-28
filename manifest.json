@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Un-Redirectinator!",
-  "description": "Blocks a protected site from redirecting you away or opening other tabs.",
+  "description": "Blocks all redirects and malicious links.",
   "version": "0.2.0",
   "permissions": ["storage", "tabs", "declarativeNetRequest"],
   "host_permissions": ["<all_urls>"],
