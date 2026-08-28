@@ -1,6 +1,6 @@
 # unredirectinator
 
-Chromium extension that can **protect selected sites** from redirecting you away or opening new tabs.
+The Un-Redirectinator can **protect selected sites** from redirecting you away or opening new tabs.
 
 ## What it does
 
@@ -18,7 +18,7 @@ Chromium extension that can **protect selected sites** from redirecting you away
 
 ## Load in Chromium
 
-1. Open `chrome://extensions`
+1. Open `chrome://extensions` (Also works in Edge, Brave, and other Chromium-based browsers!)
 2. Enable **Developer mode**
 3. Click **Load unpacked**
 4. Select this project folder
